@@ -29,25 +29,55 @@ class AlunniController
   public function insertAlunno(Request $request, Response $response, $args){
     $mysqli_connection = new MySQLi('my_mariadb', 'root', 'ciccio', 'scuola');
 
-    $data = json_decode($request->getBody(), true);
+    $data = json_decode($request->getBody()->getContents(), true);
+
     $codice_fiscale = $data["CodiceFiscale"];
     $nome = $data["Nome"];
     $cognome = $data["Cognome"];
     $eta = $data["Eta"];
 
-    $sql = "INSERT INTO Alunni('CodiceFiscale', 'Nome', 'Cognome', 'Eta')
-            VALUE($codice_fiscale, $nome, $cognome, $eta)";
-    
+    $sql = "INSERT INTO Alunni(CodiceFiscale, Nome, Cognome, Eta)
+            VALUES('$codice_fiscale', '$nome', '$cognome', $eta)";
+
     $result = $mysqli_connection->query($sql);
 
     if(!$result){
-      return $response->withStatus(404);
+      return $response->withStatus(405);
     }
 
     $sql = "SELECT * FROM Alunni 
             ORDER BY Matricola DESC 
             LIMIT 1";
     
+    $result = $mysqli_connection->query($sql);
+    $results = $result->fetch_all(MYSQLI_ASSOC);
+
+    $response->getBody()->write(json_encode($results));
+    return $response->withHeader("Content-type", "application/json")->withStatus(201);
+  }
+
+  public function updateAlunno(Request $request, Response $response, $args){
+    $mysqli_connection = new MySQLi('my_mariadb', 'root', 'ciccio', 'scuola');
+    
+    $data = json_decode($request->getBody()->getContents(), true);
+
+    $matricola = $args["matricola"];
+    $newNome = $data["Nome"];
+    $newCognome = $data["Cognome"];
+
+    $sql = "UPDATE Alunni
+            SET Nome = '$newNome', Cognome = '$newCognome'
+            WHERE Matricola = $matricola";
+
+    $result = $mysqli_connection->query($sql);
+
+    if(!result){
+      return $response->withStatus(405);
+    }    
+
+    $sql = "SELECT * FROM Alunni
+            WHERE Matricola = $matricola";
+
     $result = $mysqli_connection->query($sql);
     $results = $result->fetch_all(MYSQLI_ASSOC);
 

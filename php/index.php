@@ -11,6 +11,6 @@ $app = AppFactory::create();
 $app->get('/alunni', "AlunniController:index");
 $app->get('/alunni/{matricola}', "AlunniController:getAlunnoByMatricola");
 $app->post('/alunni', "AlunniController:insertAlunno");
-
+$app->put('/alunni/{matricola}', "AlunniController:updateAlunno");
 
 $app->run();
