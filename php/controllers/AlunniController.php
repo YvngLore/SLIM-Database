@@ -84,4 +84,21 @@ class AlunniController
     $response->getBody()->write(json_encode($results));
     return $response->withHeader("Content-type", "application/json")->withStatus(201);
   }
+
+  public function deleteAlunno(Request $request, Response $response, $args){
+    $mysqli_connection = new MySQLi('my_mariadb', 'root', 'ciccio', 'scuola');
+
+    $matricola = $args["matricola"];
+
+    $sql = "DELETE FROM Alunni
+            WHERE Matricola = $matricola";
+
+    $result = $mysqli_connection->query($sql);
+
+    if(!result){
+      return $response->withStatus(405);
+    }
+
+    return $result->withStatus(201);
+  }
 }
